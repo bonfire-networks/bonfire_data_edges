@@ -1,0 +1,178 @@
+defmodule Bonfire.Data.Edges.EdgeTotal do
+
+  use Pointers.Mixin,
+    otp_app: :bonfire_data_edges,
+    source: "bonfire_data_edges_edge_total"
+
+  require Pointers.Changesets
+  alias Bonfire.Data.Edges.EdgeTotal
+  alias Ecto.Changeset
+  alias Pointers.{Pointer, Table}
+
+  mixin_schema do
+    field :subject_count, :integer
+    field :object_count, :integer
+    belongs_to :table, Table
+  end
+
+end
+defmodule Bonfire.Data.Edges.EdgeTotal.Migration do
+
+  import Ecto.Migration
+  import Pointers.Migration
+  alias Bonfire.Data.Edges.{Edge, EdgeTotal}
+
+  @table EdgeTotal.__schema__(:source)
+  @edge_table Edge.__schema__(:source)
+
+  # create_edge_total_table/{0,1}
+
+  defp make_edge_total_table(exprs) do
+    quote do
+      require Pointers.Migration
+      Pointers.Migration.create_mixin_table(Bonfire.Data.Edges.EdgeTotal) do
+        Ecto.Migration.add :subject_count,:bigint, null: false
+        Ecto.Migration.add :object_count, :bigint, null: false
+        Ecto.Migration.add :table_id, Pointers.Migration.strong_pointer(), primary_key: true
+        unquote_splicing(exprs)
+      end
+    end
+  end
+
+  defmacro create_edge_total_table(), do: make_edge_total_table([])
+  defmacro create_edge_total_table([do: {_, _, body}]), do: make_edge_total_table(body)
+
+  # drop_edge_total_table/0
+
+  def drop_edge_total_table(), do: drop_pointable_table(Edge)
+
+
+
+  defp make_edge_total_subject_count_index(opts) do
+    quote do
+      Ecto.Migration.create_if_not_exists(
+        Ecto.Migration.index(unquote(@table), [:subject_count], unquote(opts))
+      )
+    end
+  end
+
+  defmacro create_edge_total_subject_count_index(opts \\ [])
+  defmacro create_edge_total_subject_count_index(opts), do: make_edge_total_subject_count_index(opts)
+
+  def drop_edge_total_subject_count_index(opts \\ []) do
+    drop_if_exists(index(@table, [:subject_count], opts))
+  end
+
+
+  defp make_edge_total_object_count_index(opts) do
+    quote do
+      Ecto.Migration.create_if_not_exists(
+        Ecto.Migration.index(unquote(@table), [:object_count], unquote(opts))
+      )
+    end
+  end
+
+  defmacro create_edge_total_object_count_index(opts \\ [])
+  defmacro create_edge_total_object_count_index(opts), do: make_edge_total_object_count_index(opts)
+
+  def drop_edge_total_object_count_index(opts \\ []) do
+    drop_if_exists(index(@table, [:object_count], opts))
+  end
+
+
+
+  defp make_edge_total_table_index(opts) do
+    quote do
+      Ecto.Migration.create_if_not_exists(
+        Ecto.Migration.index(unquote(@table), [:table_id], unquote(opts))
+      )
+    end
+  end
+
+  defmacro create_edge_total_table_index(opts \\ [])
+  defmacro create_edge_total_table_index(opts), do: make_edge_total_table_index(opts)
+
+  def drop_edge_total_table_index(opts \\ []) do
+    drop_if_exists(index(@table, [:table_id], opts))
+  end
+
+  @create_trigger_fun """
+  create or replace function "#{@table}_update" ()
+  returns trigger
+  language plpgsql
+  as $$
+  begin
+    if (TG_OP = 'INSERT') then
+      insert into "#{@table}" values (NEW.subject_id, 1, 0, NEW.table_id)
+      on conflict (id, table_id) do update
+        set subject_count = subject_count + 1
+        where id = NEW.subject_id;
+
+      insert into "#{@table}" values (NEW.object_id, 0, 1, NEW.table_id)
+      on conflict (id, table_id) do update
+        set object_count = object_count + 1
+        where id = NEW.object_id;
+
+    elsif (TG_OP = 'DELETE') then
+      update "#{@table}" set subject_count = GREATEST(0, subject_count - 1)
+      where id = OLD.subject_id and table_id = OLD.table_id;
+
+      update "#{@table}" set object_count = GREATEST(0, object_count - 1)
+      where id = OLD.object_id and table_id = OLD.table_id;
+
+    end if;
+    return null;
+  end;
+  $$;
+  """
+
+  @drop_trigger_fun "drop function if exists #{@table}_update cascade"
+
+  @create_trigger """
+  create trigger "#{@table}_trigger"
+  after insert or delete on "#{Edge.__schema__(:source)}"
+  for each row execute procedure "#{@table}_update"();
+  """
+
+  @drop_trigger """
+  drop trigger if exists "#{@table}_trigger" on "#{Edge.__schema__(:source)}" cascade
+  """
+
+  def migrate_edge_total_trigger do
+    Ecto.Migration.execute(@create_trigger_fun, @drop_trigger_fun)
+    Ecto.Migration.execute(@drop_trigger, @drop_trigger) # to replace if changed
+    Ecto.Migration.execute(@create_trigger, @drop_trigger)
+  end
+
+  # migrate_edge_total/{0,1}
+
+  defp met(:up) do
+    quote do
+      unquote(make_edge_total_table([]))
+      unquote(make_edge_total_subject_count_index([]))
+      unquote(make_edge_total_object_count_index([]))
+      unquote(make_edge_total_table_index([]))
+      Bonfire.Data.Edges.EdgeTotal.Migration.migrate_edge_total_trigger()
+    end
+  end
+  defp met(:down) do
+    quote do
+      Bonfire.Data.Edges.EdgeTotal.Migration.migrate_edge_total_trigger()
+      Bonfire.Data.Edges.EdgeTotal.Migration.drop_edge_total_table_index()
+      Bonfire.Data.Edges.EdgeTotal.Migration.drop_edge_total_object_count_index()
+      Bonfire.Data.Edges.EdgeTotal.Migration.drop_edge_total_subject_count_index()
+      Bonfire.Data.Edges.EdgeTotal.Migration.drop_edge_total_table()
+    end
+  end
+
+  defmacro migrate_edge_total() do
+    quote do
+      if Ecto.Migration.direction() == :up,
+        do: unquote(met(:up)),
+        else: unquote(met(:down))
+    end
+  end
+
+  defmacro migrate_edge_total(dir), do: met(dir)
+
+end
