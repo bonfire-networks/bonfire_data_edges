@@ -82,7 +82,7 @@ defmodule Bonfire.Data.Edges.Edge.Migration do
 
   defp me(:up) do
     quote do
-      Bonfire.Data.Edges.Edge.Migration.migrate_edge_table()
+      Bonfire.Data.Edges.Edge.Migration.create_edge_table()
       Bonfire.Data.Edges.Edge.Migration.migrate_edge_subject_index()
       Bonfire.Data.Edges.Edge.Migration.migrate_edge_object_index()
       Bonfire.Data.Edges.Edge.Migration.migrate_edge_table_index()
@@ -93,7 +93,7 @@ defmodule Bonfire.Data.Edges.Edge.Migration do
       Bonfire.Data.Edges.Edge.Migration.migrate_edge_table_index()
       Bonfire.Data.Edges.Edge.Migration.migrate_edge_object_index()
       Bonfire.Data.Edges.Edge.Migration.migrate_edge_subject_index()
-      Bonfire.Data.Edges.Edge.Migration.migrate_edge_table()
+      Bonfire.Data.Edges.Edge.Migration.drop_edge_table()
     end
   end
 
