@@ -144,6 +144,36 @@ defmodule Bonfire.Data.Edges.EdgeTotal.Migration do
     Ecto.Migration.execute(@create_trigger, @drop_trigger)
   end
 
+  @doc false
+  def migrate_edge_total_view(schema) when is_atom(schema) do
+    source = schema.__schema__(:source)
+    id = schema.__pointers__(:table_id)
+    migrate_edge_total_view(direction(), source, id)
+  end
+
+  @doc false
+  def migrate_edge_total_view(source, id) when is_binary(source) and is_binary(id),
+    do: migrate_edge_total_view(direction(), source, id)
+
+  @doc false
+  def migrate_edge_total_view(:up, source, id) when is_binary(source) and is_binary(id) do
+    {:ok, id} = Pointers.ULID.dump(Pointers.ULID.cast!(id))
+    execute """
+    create or replace view "#{source}" as
+      select
+        id, subject_count, object_count, table_id
+      from #{@table}
+        where table_id = ('#{Ecto.UUID.cast!(id)}' :: uuid)
+    """
+  end
+  def migrate_edge_total_view(:down, source, _id) do
+    execute """
+    drop view if exists "#{source}"
+    """
+  end
+
+
+
   # migrate_edge_total/{0,1}
 
   defp met(:up) do
