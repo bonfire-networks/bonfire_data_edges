@@ -105,13 +105,13 @@ defmodule Bonfire.Data.Edges.EdgeTotal.Migration do
     if (TG_OP = 'INSERT') then
       insert into "#{@table}" values (NEW.subject_id, 1, 0, NEW.table_id)
       on conflict (id, table_id) do update
-        set subject_count = subject_count + 1
-        where id = NEW.subject_id;
+        set subject_count = EXCLUDED.subject_count + 1
+        where "#{@table}".id = NEW.subject_id;
 
       insert into "#{@table}" values (NEW.object_id, 0, 1, NEW.table_id)
       on conflict (id, table_id) do update
-        set object_count = object_count + 1
-        where id = NEW.object_id;
+        set object_count = EXCLUDED.object_count + 1
+        where "#{@table}".id = NEW.object_id;
 
     elsif (TG_OP = 'DELETE') then
       update "#{@table}" set subject_count = GREATEST(0, subject_count - 1)
@@ -139,6 +139,7 @@ defmodule Bonfire.Data.Edges.EdgeTotal.Migration do
   """
 
   def migrate_edge_total_trigger do
+    IO.inspect(@create_trigger_fun)
     Ecto.Migration.execute(@create_trigger_fun, @drop_trigger_fun)
     Ecto.Migration.execute(@drop_trigger, @drop_trigger) # to replace if changed
     Ecto.Migration.execute(@create_trigger, @drop_trigger)
