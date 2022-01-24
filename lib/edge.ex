@@ -7,12 +7,12 @@ defmodule Bonfire.Data.Edges.Edge do
   require Pointers.Changesets
   alias Bonfire.Data.Edges.Edge
   alias Ecto.Changeset
-  alias Pointers.{Pointer, Table}
+  alias Pointers.Pointer
 
   mixin_schema do
     belongs_to :subject, Pointer
     belongs_to :object,  Pointer
-    belongs_to :table,   Table
+    belongs_to :table,  Pointer
   end
 
   @cast     [:subject_id, :object_id, :table_id]
