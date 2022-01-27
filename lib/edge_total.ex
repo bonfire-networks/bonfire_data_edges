@@ -10,9 +10,16 @@ defmodule Bonfire.Data.Edges.EdgeTotal do
   alias Pointers.{Pointer, Table}
 
   mixin_schema do
-    field :subject_count, :integer
-    field :object_count, :integer
+    field :subject_count, :integer, default: 0
+    field :object_count, :integer, default: 0
     belongs_to :table, Table
+  end
+
+  @cast [:subject_count, :object_count, :table_id]
+  @required [:table_id]
+
+  def changeset(me \\ %EdgeTotal{}, params) do
+    Changeset.cast(me, params, [:table_id])
   end
 
 end
