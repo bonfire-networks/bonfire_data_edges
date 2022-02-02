@@ -51,7 +51,7 @@ defmodule Bonfire.Data.Edges.EdgeTotal.Migration do
 
   # drop_edge_total_table/0
 
-  def drop_edge_total_table(), do: drop_pointable_table(Edge)
+  def drop_edge_total_table(), do: drop_mixin_table(EdgeTotal)
 
 
 
