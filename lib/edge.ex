@@ -25,6 +25,7 @@ defmodule Bonfire.Data.Edges.Edge do
     |> Changeset.assoc_constraint(:subject)
     |> Changeset.assoc_constraint(:object)
     |> Changeset.assoc_constraint(:table)
+    |> Changeset.unique_constraint([:subject_id, :object_id, :table_id])
   end
 
 end
@@ -58,7 +59,7 @@ defmodule Bonfire.Data.Edges.Edge.Migration do
 
   # drop_edge_table/0
 
-  def drop_edge_table(), do: drop_pointable_table(Edge)
+  def drop_edge_table(), do: drop_mixin_table(Edge)
 
   def migrate_edge_subject_index(dir \\ direction(), opts \\ [])
   def migrate_edge_subject_index(:up, opts),
@@ -126,3 +127,4 @@ defmodule Bonfire.Data.Edges.Edge.Migration do
   end
 
 end
+ 
