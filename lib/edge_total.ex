@@ -7,7 +7,7 @@ defmodule Bonfire.Data.Edges.EdgeTotal do
   require Pointers.Changesets
   alias Bonfire.Data.Edges.EdgeTotal
   alias Ecto.Changeset
-  alias Pointers.{Pointer, Table}
+  alias Pointers.Table
 
   mixin_schema do
     field :subject_count, :integer, default: 0
@@ -15,11 +15,11 @@ defmodule Bonfire.Data.Edges.EdgeTotal do
     belongs_to :table, Table
   end
 
-  @cast [:subject_count, :object_count, :table_id]
+  # @cast [:subject_count, :object_count, :table_id]
   @required [:table_id]
 
   def changeset(me \\ %EdgeTotal{}, params) do
-    Changeset.cast(me, params, [:table_id])
+    Changeset.cast(me, params, @required)
   end
 
 end
@@ -30,7 +30,7 @@ defmodule Bonfire.Data.Edges.EdgeTotal.Migration do
   alias Bonfire.Data.Edges.{Edge, EdgeTotal}
 
   @table EdgeTotal.__schema__(:source)
-  @edge_table Edge.__schema__(:source)
+  # @edge_table Edge.__schema__(:source)
 
   # create_edge_total_table/{0,1}
 
