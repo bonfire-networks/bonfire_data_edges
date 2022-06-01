@@ -26,6 +26,7 @@ defmodule Bonfire.Data.Edges.Edge do
     |> Changeset.assoc_constraint(:object)
     |> Changeset.assoc_constraint(:table)
     |> Changeset.unique_constraint([:subject_id, :object_id, :table_id])
+    # |> Map.put(:repo_opts, [on_conflict: :replace_all, conflict_target: [:subject_id, :object_id, :table_id]])
   end
 
 end
@@ -127,4 +128,3 @@ defmodule Bonfire.Data.Edges.Edge.Migration do
   end
 
 end
- 
