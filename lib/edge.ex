@@ -1,5 +1,4 @@
 defmodule Bonfire.Data.Edges.Edge do
-
   use Pointers.Mixin,
     otp_app: :bonfire_data_edges,
     source: "bonfire_data_edges_edge"
@@ -10,12 +9,12 @@ defmodule Bonfire.Data.Edges.Edge do
   alias Pointers.Pointer
 
   mixin_schema do
-    belongs_to :subject, Pointer
-    belongs_to :object,  Pointer
-    belongs_to :table,  Pointer
+    belongs_to(:subject, Pointer)
+    belongs_to(:object, Pointer)
+    belongs_to(:table, Pointer)
   end
 
-  @cast     [:subject_id, :object_id, :table_id]
+  @cast [:subject_id, :object_id, :table_id]
   @required @cast
 
   def changeset(edge \\ %Edge{}, params) do
@@ -26,12 +25,12 @@ defmodule Bonfire.Data.Edges.Edge do
     |> Changeset.assoc_constraint(:object)
     |> Changeset.assoc_constraint(:table)
     |> Changeset.unique_constraint([:subject_id, :object_id, :table_id])
+
     # |> Map.put(:repo_opts, [on_conflict: :replace_all, conflict_target: [:subject_id, :object_id, :table_id]])
   end
-
 end
-defmodule Bonfire.Data.Edges.Edge.Migration do
 
+defmodule Bonfire.Data.Edges.Edge.Migration do
   import Ecto.Migration
   import Pointers.Migration
   alias Bonfire.Data.Edges.Edge
@@ -43,40 +42,59 @@ defmodule Bonfire.Data.Edges.Edge.Migration do
   defp make_edge_table(exprs) do
     quote do
       require Pointers.Migration
-      Pointers.Migration.create_mixin_table(Bonfire.Data.Edges.Edge) do
-        Ecto.Migration.add :subject_id,
-          Pointers.Migration.strong_pointer(), null: false
-        Ecto.Migration.add :object_id,
-          Pointers.Migration.strong_pointer(), null: false
-        Ecto.Migration.add :table_id,
-          Pointers.Migration.strong_pointer(), null: false
+
+      Pointers.Migration.create_mixin_table Bonfire.Data.Edges.Edge do
+        Ecto.Migration.add(
+          :subject_id,
+          Pointers.Migration.strong_pointer(),
+          null: false
+        )
+
+        Ecto.Migration.add(
+          :object_id,
+          Pointers.Migration.strong_pointer(),
+          null: false
+        )
+
+        Ecto.Migration.add(
+          :table_id,
+          Pointers.Migration.strong_pointer(),
+          null: false
+        )
+
         unquote_splicing(exprs)
       end
     end
   end
 
   defmacro create_edge_table(), do: make_edge_table([])
-  defmacro create_edge_table([do: {_, _, body}]), do: make_edge_table(body)
+  defmacro create_edge_table(do: {_, _, body}), do: make_edge_table(body)
 
   # drop_edge_table/0
 
   def drop_edge_table(), do: drop_mixin_table(Edge)
 
   def migrate_edge_subject_index(dir \\ direction(), opts \\ [])
+
   def migrate_edge_subject_index(:up, opts),
     do: create_if_not_exists(index(@edge_table, [:subject_id], opts))
+
   def migrate_edge_subject_index(:down, opts),
     do: drop_if_exists(index(@edge_table, [:subject_id], opts))
 
   def migrate_edge_object_index(dir \\ direction(), opts \\ [])
+
   def migrate_edge_object_index(:up, opts),
     do: create_if_not_exists(index(@edge_table, [:object_id], opts))
+
   def migrate_edge_object_index(:down, opts),
     do: drop_if_exists(index(@edge_table, [:object_id], opts))
 
   def migrate_edge_table_index(dir \\ direction(), opts \\ [])
+
   def migrate_edge_table_index(:up, opts),
     do: create_if_not_exists(index(@edge_table, [:table_id], opts))
+
   def migrate_edge_table_index(:down, opts),
     do: drop_if_exists(index(@edge_table, [:table_id], opts))
 
@@ -90,6 +108,7 @@ defmodule Bonfire.Data.Edges.Edge.Migration do
       Bonfire.Data.Edges.Edge.Migration.migrate_edge_table_index()
     end
   end
+
   defp me(:down) do
     quote do
       Bonfire.Data.Edges.Edge.Migration.migrate_edge_table_index()
@@ -110,21 +129,31 @@ defmodule Bonfire.Data.Edges.Edge.Migration do
   defmacro migrate_edge(dir), do: me(dir)
 
   def migrate_type_unique_index(dir \\ direction(), schema)
+
   def migrate_type_unique_index(:up, schema) do
     name = schema.__schema__(:source)
-    id = schema.__pointers__(:table_id)
-    |> Pointers.ULID.dump()
-    |> elem(1)
-    |> Ecto.UUID.cast!()
-    create_if_not_exists unique_index(@edge_table, [:subject_id, :object_id, :table_id],
-      where: "table_id = '#{id}'",
-      name: "#{@edge_table}_#{name}_unique_index")
+
+    id =
+      schema.__pointers__(:table_id)
+      |> Pointers.ULID.dump()
+      |> elem(1)
+      |> Ecto.UUID.cast!()
+
+    create_if_not_exists(
+      unique_index(@edge_table, [:subject_id, :object_id, :table_id],
+        where: "table_id = '#{id}'",
+        name: "#{@edge_table}_#{name}_unique_index"
+      )
+    )
   end
 
   def migrate_type_unique_index(:down, schema) do
     name = schema.__schema__(:source)
-    drop_if_exists unique_index(@edge_table, [:subject_id, :object_id, :table_id],
-      name: "#{@edge_table}_#{name}_unique_index")
-  end
 
+    drop_if_exists(
+      unique_index(@edge_table, [:subject_id, :object_id, :table_id],
+        name: "#{@edge_table}_#{name}_unique_index"
+      )
+    )
+  end
 end

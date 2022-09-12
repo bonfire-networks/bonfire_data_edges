@@ -12,13 +12,14 @@ defmodule Bonfire.Data.Edges.MixProject do
   end
 
   # Run "mix help compile.app" to learn about applications.
-  def application, do: [ extra_applications: [:logger] ]
+  def application, do: [extra_applications: [:logger]]
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
       # {:pointers, "~> 0.5.0"}
-      {:pointers, git: "https://github.com/bonfire-networks/pointers.git", branch: "main"}
+      {:pointers,
+       git: "https://github.com/bonfire-networks/pointers.git", branch: "main"}
       # {:pointers, path: "../pointers"}
     ]
   end

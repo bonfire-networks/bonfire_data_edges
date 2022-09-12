@@ -15,5 +15,4 @@ defmodule Bonfire.Data.Edges.Migration do
     EdgeTotal.migrate_edge_total()
     Edge.migrate_edge()
   end
-
 end
