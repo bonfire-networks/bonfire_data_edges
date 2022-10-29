@@ -21,6 +21,8 @@ defmodule Bonfire.Data.Edges.Edge do
     edge
     |> Changeset.cast(params, @cast)
     |> Changeset.validate_required(@required)
+    # |> Changeset.cast_assoc(:subject)
+    # |> Changeset.cast_assoc(:object)
     |> Changeset.assoc_constraint(:subject)
     |> Changeset.assoc_constraint(:object)
     |> Changeset.assoc_constraint(:table)
