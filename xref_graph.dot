@@ -1,0 +1,8 @@
+digraph "xref graph" {
+  "lib/edge.ex"
+  "lib/edge_total.ex"
+  "lib/edge_total.ex" -> "lib/edge.ex" [label="(compile)"]
+  "lib/migration.ex"
+  "lib/migration.ex" -> "lib/edge.ex" [label="(compile)"]
+  "lib/migration.ex" -> "lib/edge_total.ex" [label="(compile)"]
+}
