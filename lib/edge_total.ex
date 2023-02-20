@@ -23,6 +23,7 @@ defmodule Bonfire.Data.Edges.EdgeTotal do
 end
 
 defmodule Bonfire.Data.Edges.EdgeTotal.Migration do
+  @moduledoc false
   import Ecto.Migration
   import Pointers.Migration
   alias Bonfire.Data.Edges.Edge

@@ -1,4 +1,5 @@
 defmodule Bonfire.Data.Edges.Migration do
+  @moduledoc false
   use Ecto.Migration
   alias Bonfire.Data.Edges.Edge.Migration, as: Edge
   alias Bonfire.Data.Edges.EdgeTotal.Migration, as: EdgeTotal
