@@ -131,6 +131,7 @@ defmodule Bonfire.Data.Edges.Edge.Migration do
 
   defmacro migrate_edge(dir), do: me(dir)
 
+  @doc "Define a unique index if you don't want duplicate edges of a specific type"
   def migrate_type_unique_index(dir \\ direction(), schema)
 
   def migrate_type_unique_index(:up, schema) do
