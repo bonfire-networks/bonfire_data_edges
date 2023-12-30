@@ -1,12 +1,12 @@
 defmodule Bonfire.Data.Edges.EdgeTotal do
-  use Pointers.Mixin,
+  use Needle.Mixin,
     otp_app: :bonfire_data_edges,
     source: "bonfire_data_edges_edge_total"
 
-  require Pointers.Changesets
+  require Needle.Changesets
   alias Bonfire.Data.Edges.EdgeTotal
   alias Ecto.Changeset
-  alias Pointers.Table
+  alias Needle.Table
 
   mixin_schema do
     field(:subject_count, :integer, default: 0)
@@ -25,7 +25,7 @@ end
 defmodule Bonfire.Data.Edges.EdgeTotal.Migration do
   @moduledoc false
   import Ecto.Migration
-  import Pointers.Migration
+  import Needle.Migration
   alias Bonfire.Data.Edges.Edge
   alias Bonfire.Data.Edges.EdgeTotal
 
@@ -36,13 +36,13 @@ defmodule Bonfire.Data.Edges.EdgeTotal.Migration do
 
   defp make_edge_total_table(exprs) do
     quote do
-      require Pointers.Migration
+      require Needle.Migration
 
-      Pointers.Migration.create_mixin_table Bonfire.Data.Edges.EdgeTotal do
+      Needle.Migration.create_mixin_table Bonfire.Data.Edges.EdgeTotal do
         Ecto.Migration.add(:subject_count, :bigint, null: false)
         Ecto.Migration.add(:object_count, :bigint, null: false)
 
-        Ecto.Migration.add(:table_id, Pointers.Migration.strong_pointer(), primary_key: true)
+        Ecto.Migration.add(:table_id, Needle.Migration.strong_pointer(), primary_key: true)
 
         unquote_splicing(exprs)
       end
@@ -174,7 +174,7 @@ defmodule Bonfire.Data.Edges.EdgeTotal.Migration do
   @doc false
   def migrate_edge_total_view(:up, source, id)
       when is_binary(source) and is_binary(id) do
-    {:ok, id} = Pointers.ULID.dump(Pointers.ULID.cast!(id))
+    {:ok, id} = Needle.ULID.dump(Needle.ULID.cast!(id))
 
     execute("""
     create or replace view "#{source}_total" as

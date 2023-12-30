@@ -30,10 +30,9 @@ defmodule Bonfire.Data.Edges.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     Mess.deps [
-      # {:pointers, "~> 0.5.0"}
-      {:pointers,
-       git: "https://github.com/bonfire-networks/pointers.git", branch: "main"}
-      # {:pointers, path: "../pointers"}
+      {:needle, "~> 0.7.0"}
+      # {:needle, git: "https://github.com/bonfire-networks/needle.git", branch: "main"}
+      # {:needle, path: "../needle"}
     ]
   end
 end

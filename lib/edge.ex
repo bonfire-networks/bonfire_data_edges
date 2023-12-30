@@ -1,12 +1,12 @@
 defmodule Bonfire.Data.Edges.Edge do
-  use Pointers.Mixin,
+  use Needle.Mixin,
     otp_app: :bonfire_data_edges,
     source: "bonfire_data_edges_edge"
 
-  require Pointers.Changesets
+  require Needle.Changesets
   alias Bonfire.Data.Edges.Edge
   alias Ecto.Changeset
-  alias Pointers.Pointer
+  alias Needle.Pointer
 
   mixin_schema do
     belongs_to(:subject, Pointer)
@@ -35,7 +35,7 @@ end
 defmodule Bonfire.Data.Edges.Edge.Migration do
   @moduledoc false
   import Ecto.Migration
-  import Pointers.Migration
+  import Needle.Migration
   alias Bonfire.Data.Edges.Edge
 
   @edge_table Edge.__schema__(:source)
@@ -44,24 +44,24 @@ defmodule Bonfire.Data.Edges.Edge.Migration do
 
   defp make_edge_table(exprs) do
     quote do
-      require Pointers.Migration
+      require Needle.Migration
 
-      Pointers.Migration.create_mixin_table Bonfire.Data.Edges.Edge do
+      Needle.Migration.create_mixin_table Bonfire.Data.Edges.Edge do
         Ecto.Migration.add(
           :subject_id,
-          Pointers.Migration.strong_pointer(),
+          Needle.Migration.strong_pointer(),
           null: false
         )
 
         Ecto.Migration.add(
           :object_id,
-          Pointers.Migration.strong_pointer(),
+          Needle.Migration.strong_pointer(),
           null: false
         )
 
         Ecto.Migration.add(
           :table_id,
-          Pointers.Migration.strong_pointer(),
+          Needle.Migration.strong_pointer(),
           null: false
         )
 
@@ -139,7 +139,7 @@ defmodule Bonfire.Data.Edges.Edge.Migration do
 
     id =
       schema.__pointers__(:table_id)
-      |> Pointers.ULID.dump()
+      |> Needle.ULID.dump()
       |> elem(1)
       |> Ecto.UUID.cast!()
 
