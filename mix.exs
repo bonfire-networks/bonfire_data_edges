@@ -31,7 +31,7 @@ defmodule Bonfire.Data.Edges.MixProject do
   defp deps do
     Mess.deps [
       {:needle, "~> 0.7.0"}
-      # {:needle, git: "https://github.com/bonfire-networks/needle.git", branch: "main"}
+      # {:needle, git: "https://github.com/bonfire-networks/needle.git"}
       # {:needle, path: "../needle"}
     ]
   end
