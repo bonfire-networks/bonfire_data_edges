@@ -152,7 +152,7 @@ defmodule Bonfire.Data.Edges.EdgeTotal.Migration do
   """
 
   def migrate_edge_total_trigger do
-    IO.inspect(@create_trigger_fun)
+    # IO.inspect(@create_trigger_fun)
     Ecto.Migration.execute(@create_trigger_fun, @drop_trigger_fun)
     # to replace if changed
     Ecto.Migration.execute(@drop_trigger, @drop_trigger)
