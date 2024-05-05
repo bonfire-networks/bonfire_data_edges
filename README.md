@@ -1,1 +1,1 @@
-# Bonfire data edges
+# Bonfire.Data.Edges
