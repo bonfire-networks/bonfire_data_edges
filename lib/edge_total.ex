@@ -174,7 +174,7 @@ defmodule Bonfire.Data.Edges.EdgeTotal.Migration do
   @doc false
   def migrate_edge_total_view(:up, source, id)
       when is_binary(source) and is_binary(id) do
-    {:ok, id} = Needle.ULID.dump(Needle.ULID.cast!(id))
+    {:ok, id} = Needle.ULID.dump(Needle.UID.cast!(id))
 
     execute("""
     create or replace view "#{source}_total" as
