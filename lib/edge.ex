@@ -9,12 +9,12 @@ defmodule Bonfire.Data.Edges.Edge do
   alias Needle.Pointer
 
   mixin_schema do
-    # primary key matches the Activity 
+    # primary key matches the Activity (eg. the Request, Follow, etc)
 
     # the who (eg. a user)
     belongs_to(:subject, Pointer)
 
-    # what kind of action (eg. table_id of Like, Follow, ...)
+    # what kind of action (eg. table_id of Like, Follow, ...) NOTE: this points to Pointer and not Table so despite it's name can also be used to point to other things like a Post or User if needed
     belongs_to(:table, Pointer)
 
     # the what (eg. a specific post)
